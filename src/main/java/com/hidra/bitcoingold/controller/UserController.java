@@ -1,6 +1,7 @@
 package com.hidra.bitcoingold.controller;
 
 import com.hidra.bitcoingold.domain.User;
+import com.hidra.bitcoingold.dtos.UserPostDto;
 import com.hidra.bitcoingold.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ public class UserController {
 
     private final UserService userService;
 
+
+
     @GetMapping
     public List<User> findAll() {
         return userService.findAll();
@@ -25,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser(@RequestBody User userPostDto) {
+    public void createUser(@RequestBody UserPostDto userPostDto) {
         userService.createUser(userPostDto);
     }
 
