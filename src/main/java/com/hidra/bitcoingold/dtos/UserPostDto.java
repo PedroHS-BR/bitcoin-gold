@@ -1,5 +1,10 @@
 package com.hidra.bitcoingold.dtos;
 
-public class UserPostDto {
+import lombok.Data;
 
+@Data
+public class UserPostDto {
+    private String name;
+    private String email;
+    private String password;
 }
