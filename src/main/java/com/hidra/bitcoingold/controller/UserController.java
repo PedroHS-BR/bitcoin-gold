@@ -1,9 +1,14 @@
 package com.hidra.bitcoingold.controller;
 
 import com.hidra.bitcoingold.domain.User;
-import com.hidra.bitcoingold.dtos.UserPostDto;
+import com.hidra.bitcoingold.dtos.UserLoginRequest;
+import com.hidra.bitcoingold.dtos.UserResponse;
+import com.hidra.bitcoingold.dtos.UserPostRequest;
+import com.hidra.bitcoingold.mapper.UserMapper;
 import com.hidra.bitcoingold.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,21 +20,24 @@ public class UserController {
 
     private final UserService userService;
 
-
-
     @GetMapping
-    public List<User> findAll() {
+    public List<UserResponse> findAll() {
         return userService.findAll();
     }
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable Long id) {
-        return userService.findById(id);
+    public UserResponse findById(@PathVariable Long id) {
+        return UserMapper.INSTANCE.toUserResponse(userService.findById(id));
     }
 
     @PostMapping
-    public void createUser(@RequestBody UserPostDto userPostDto) {
-        userService.createUser(userPostDto);
+    public void createUser(@RequestBody UserPostRequest userPostRequest) {
+        userService.createUser(userPostRequest);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest userLoginRequest) {
+        return new ResponseEntity<>(userService.login(userLoginRequest), HttpStatus.OK);
     }
 
     @PutMapping
@@ -37,7 +45,12 @@ public class UserController {
         userService.updateUser(user);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+
+    @DeleteMapping("/all")
     public void deleteAll(){
         userService.deleteAll();
     }
