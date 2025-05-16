@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {
@@ -20,4 +21,5 @@ public abstract class UserMapper {
     public abstract List<UserResponse> toUserResponseList(List<User> user);
 
     public abstract UserResponse toUserResponse(User user);
+
 }

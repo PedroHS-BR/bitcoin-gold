@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +23,11 @@ public class UserService {
     public List<UserResponse> findAll() {
         List<User> allUsers = userRepository.findAll();
         return UserMapper.INSTANCE.toUserResponseList(allUsers);
+
     }
 
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("User not found"));
+    public User findById(UUID id) {
+        return userRepository.findUserById(id).orElseThrow(() -> new BadRequestException("User not found"));
     }
 
     public void createUser(UserPostRequest userPostRequest) {
@@ -37,7 +38,7 @@ public class UserService {
     public UserResponse login(UserLoginRequest userLoginRequest) {
         User savedUser = findByEmail(userLoginRequest.getEmail());
         if (savedUser != null && savedUser.getPassword().equals(userLoginRequest.getPassword())) {
-            return new UserResponse(savedUser.getName(), savedUser.getEmail());
+            return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail());
         }
         throw new BadRequestException("Login or password is incorrect");
     }
@@ -57,11 +58,9 @@ public class UserService {
     @Transactional
     public void deleteAll() {
         userRepository.deleteAll();
-        userRepository.resetAutoIncrement();
     }
 
-    public void deleteUser(Long id) {
-        findById(id);
-        userRepository.deleteById(id);
+    public void deleteUser(UUID id) {
+        userRepository.delete(findById(id));
     }
 }
