@@ -2,13 +2,17 @@ package com.hidra.bitcoingold.controller;
 
 import com.hidra.bitcoingold.domain.User;
 import com.hidra.bitcoingold.dtos.UserLoginRequest;
-import com.hidra.bitcoingold.dtos.UserResponse;
 import com.hidra.bitcoingold.dtos.UserPostRequest;
+import com.hidra.bitcoingold.dtos.UserResponse;
 import com.hidra.bitcoingold.mapper.UserMapper;
+import com.hidra.bitcoingold.security.TokenService;
 import com.hidra.bitcoingold.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +24,8 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
     @GetMapping
     public List<UserResponse> findAll() {
@@ -37,8 +43,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest userLoginRequest) {
-        return new ResponseEntity<>(userService.login(userLoginRequest), HttpStatus.OK);
+    public ResponseEntity<String> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(userLoginRequest.getEmail(), userLoginRequest.getPassword());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
+        String token = tokenService.generateToken((User) auth.getPrincipal());
+
+        return ResponseEntity.ok(token);
     }
 
     @PutMapping
@@ -51,8 +61,4 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    @DeleteMapping("/all")
-    public void deleteAll(){
-        userService.deleteAll();
-    }
 }

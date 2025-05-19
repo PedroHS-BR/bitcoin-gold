@@ -1,5 +1,6 @@
 package com.hidra.bitcoingold.dtos;
 
+import com.hidra.bitcoingold.domain.UserRole;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -11,4 +12,6 @@ public class UserPostRequest {
     private String email;
     @NotBlank(message = "The password must not be null, empty, or contain only whitespace.")
     private String password;
+    @NotBlank
+    private UserRole role;
 }
