@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,9 +46,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(userLoginRequest.getEmail(), userLoginRequest.getPassword());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
+        Authentication auth = this.authenticationManager.authenticate(usernamePassword);
         String token = tokenService.generateToken((User) auth.getPrincipal());
-
         return ResponseEntity.ok(token);
     }
 

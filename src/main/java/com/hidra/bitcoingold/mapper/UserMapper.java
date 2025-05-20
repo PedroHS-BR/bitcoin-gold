@@ -16,8 +16,6 @@ public abstract class UserMapper {
 
     public abstract User toUser(UserPostRequest userPostRequest);
 
-    public abstract User toUser(UserLoginRequest userLoginRequest);
-
     public abstract List<UserResponse> toUserResponseList(List<User> user);
 
     public abstract UserResponse toUserResponse(User user);
