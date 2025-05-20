@@ -1,16 +1,11 @@
 package com.hidra.bitcoingold.dtos;
 
 import com.hidra.bitcoingold.domain.UserRole;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-public class UserResponse {
-    private UUID id;
-    private String name;
-    private String email;
-    private UserRole role;
-}
+public record UserResponse(
+        UUID id,
+        String name,
+        String email,
+        UserRole role
+) {}
