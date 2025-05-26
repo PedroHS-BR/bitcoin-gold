@@ -1,13 +1,11 @@
 package com.hidra.bitcoingold.service;
 
 import com.hidra.bitcoingold.domain.User;
-import com.hidra.bitcoingold.dtos.UserPostRequest;
-import com.hidra.bitcoingold.dtos.UserResponse;
 import com.hidra.bitcoingold.exception.BadRequestException;
-import com.hidra.bitcoingold.mapper.UserMapper;
 import com.hidra.bitcoingold.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +16,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -28,7 +27,7 @@ public class UserService {
     }
 
     public void createUser(User user) {
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -36,7 +35,10 @@ public class UserService {
         User savedUser = findById(user.getId());
         if (user.getEmail() != null) savedUser.setEmail(user.getEmail());
         if (user.getName() != null) savedUser.setName(user.getName());
-        if (user.getPassword() != null) savedUser.setPassword(user.getPassword());
+        if (user.getPassword() != null) {
+            String encode = passwordEncoder.encode(user.getPassword());
+            savedUser.setPassword(encode);
+        }
         if (user.getRole() != null) savedUser.setRole(user.getRole());
         userRepository.save(savedUser);
     }

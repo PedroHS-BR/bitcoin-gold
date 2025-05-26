@@ -10,6 +10,5 @@ public record UserPostRequest(
         String email,
         @NotBlank (message = "The password must not be null, empty, or contain only whitespace.")
         String password,
-        @NotBlank
         UserRole role
 ) {}

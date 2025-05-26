@@ -31,6 +31,13 @@ public class SecurityFilter extends OncePerRequestFilter {
             String login = tokenService.verifyToken(token);
             UserDetails user = userRepository.findUserByEmail(login);
 
+            if (user == null){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Invalid token: user not found\"}");
+                return;
+            }
+
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

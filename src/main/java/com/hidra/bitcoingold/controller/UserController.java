@@ -2,6 +2,7 @@ package com.hidra.bitcoingold.controller;
 
 import com.hidra.bitcoingold.domain.User;
 import com.hidra.bitcoingold.dtos.*;
+import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.mapper.UserMapper;
 import com.hidra.bitcoingold.security.TokenService;
 import com.hidra.bitcoingold.service.UserService;
@@ -36,16 +37,20 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser(@RequestBody UserPostRequest userPostRequest) {
+    public void createUser(@RequestBody @Valid UserPostRequest userPostRequest) {
         userService.createUser(UserMapper.INSTANCE.toUser(userPostRequest));
     }
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(userLoginRequest.email(), userLoginRequest.password());
-        Authentication auth = this.authenticationManager.authenticate(usernamePassword);
-        String token = tokenService.generateToken((User) auth.getPrincipal());
-        return ResponseEntity.ok(new TokenResponse(token));
+        try {
+            var usernamePassword = new UsernamePasswordAuthenticationToken(userLoginRequest.email(), userLoginRequest.password());
+            Authentication auth = this.authenticationManager.authenticate(usernamePassword);
+            String token = tokenService.generateToken((User) auth.getPrincipal());
+            return ResponseEntity.ok(new TokenResponse(token));
+        } catch (Exception e) {
+            throw new BadRequestException("Invalid email or password");
+        }
     }
 
     @PutMapping
