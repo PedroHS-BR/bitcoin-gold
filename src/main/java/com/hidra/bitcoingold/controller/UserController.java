@@ -8,6 +8,7 @@ import com.hidra.bitcoingold.security.TokenService;
 import com.hidra.bitcoingold.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,10 +37,24 @@ public class UserController {
         return UserMapper.INSTANCE.toUserResponse(userService.findById(id));
     }
 
-    @PostMapping
-    public void createUser(@RequestBody @Valid UserPostRequest userPostRequest) {
-        userService.createUser(UserMapper.INSTANCE.toUser(userPostRequest));
+    @GetMapping("/regularUser/get")
+    public ResponseEntity<UserResponse> getRegularUser() {
+        User regularUser = userService.getRegularUser();
+        return new ResponseEntity<>(UserMapper.INSTANCE.toUserResponse(regularUser), HttpStatus.OK);
     }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserPostRequest userPostRequest) {
+        User user = userService.createUser(UserMapper.INSTANCE.toUser(userPostRequest));
+        return new ResponseEntity<>(UserMapper.INSTANCE.toUserResponse(user), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/regularUser/new")
+    public ResponseEntity<UserResponse> createRegularUser(@RequestBody @Valid CommonUserPostRequest commonUserPostRequest) {
+        User user = userService.createRegularuser(UserMapper.INSTANCE.toUser(commonUserPostRequest));
+        return new ResponseEntity<>(UserMapper.INSTANCE.toUserResponse(user), HttpStatus.CREATED);
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
