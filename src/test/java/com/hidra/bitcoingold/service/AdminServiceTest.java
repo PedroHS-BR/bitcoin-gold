@@ -21,9 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(SpringExtension.class)
-class UserServiceTest {
+class AdminServiceTest {
     @InjectMocks
-    private UserService userService;
+    private AdminService adminService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -44,7 +44,7 @@ class UserServiceTest {
 
     @Test
     void findAll_returnsAllUsers_WhenUserExists() {
-        List<User> all = userService.findAll();
+        List<User> all = adminService.findAll();
         assertThat(all).hasSize(2).containsExactlyInAnyOrder(user, user);
     }
 
@@ -56,13 +56,13 @@ class UserServiceTest {
 
     @Test
     void findById_returnsUser_WhenUserExists() {
-        User byId = userService.findById(user.getId());
+        User byId = adminService.findById(user.getId());
         assertThat(byId).isEqualTo(user);
     }
     @Test
     void findById_ThrowsException_WhenUserNotExists() {
         UUID nonexistentId = UUID.randomUUID();
-        assertThatThrownBy(() -> userService.findById(nonexistentId))
+        assertThatThrownBy(() -> adminService.findById(nonexistentId))
         .isInstanceOf(BadRequestException.class);
     }
 

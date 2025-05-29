@@ -1,7 +1,7 @@
 package com.hidra.bitcoingold.mapper;
 
 import com.hidra.bitcoingold.domain.User;
-import com.hidra.bitcoingold.dtos.CommonUserPostRequest;
+import com.hidra.bitcoingold.dtos.RegisterUserPostRequest;
 import com.hidra.bitcoingold.dtos.UserPostRequest;
 import com.hidra.bitcoingold.dtos.UserResponse;
 import com.hidra.bitcoingold.dtos.UserUpdateRequest;
@@ -18,7 +18,7 @@ public abstract class UserMapper {
 
     public abstract User toUser(UserUpdateRequest userUpdateRequest);
 
-    public abstract User toUser(CommonUserPostRequest commonUserPostRequest);
+    public abstract User toUser(RegisterUserPostRequest commonUserPostRequest);
 
     public abstract List<UserResponse> toUserResponseList(List<User> user);
 
