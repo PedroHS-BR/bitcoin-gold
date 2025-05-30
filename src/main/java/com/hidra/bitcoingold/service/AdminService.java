@@ -27,6 +27,7 @@ public class AdminService {
 
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null) throw new BadRequestException("Role is required");
         userRepository.save(user);
         return user;
     }

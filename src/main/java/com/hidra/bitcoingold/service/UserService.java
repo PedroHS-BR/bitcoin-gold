@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-
+    private final PasswordEncoder passwordEncoder;
 
     public User getRegularUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -22,5 +23,23 @@ public class UserService {
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         }
         return null;
+    }
+
+    public User updateUser(User user) {
+        User savedUser = getRegularUser();
+        if (user.getEmail() != null) savedUser.setEmail(user.getEmail());
+        if (user.getName() != null) savedUser.setName(user.getName());
+        if (user.getPassword() != null) {
+            String encode = passwordEncoder.encode(user.getPassword());
+            savedUser.setPassword(encode);
+        }
+        userRepository.save(savedUser);
+        return savedUser;
+    }
+
+    public User deleteUser() {
+        User regularUser = getRegularUser();
+        userRepository.delete(regularUser);
+        return regularUser;
     }
 }

@@ -1,9 +1,9 @@
 package com.hidra.bitcoingold.controller;
 
 import com.hidra.bitcoingold.domain.User;
-import com.hidra.bitcoingold.dtos.UserPostRequest;
-import com.hidra.bitcoingold.dtos.UserResponse;
-import com.hidra.bitcoingold.dtos.UserUpdateRequest;
+import com.hidra.bitcoingold.dtos.user.UserPostRequest;
+import com.hidra.bitcoingold.dtos.user.UserResponse;
+import com.hidra.bitcoingold.dtos.user.UserUpdateRequest;
 import com.hidra.bitcoingold.mapper.UserMapper;
 import com.hidra.bitcoingold.service.AdminService;
 import jakarta.validation.Valid;

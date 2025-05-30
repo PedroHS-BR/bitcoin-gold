@@ -1,4 +1,4 @@
-package com.hidra.bitcoingold.dtos;
+package com.hidra.bitcoingold.dtos.user;
 
 import com.hidra.bitcoingold.domain.UserRole;
 import lombok.Data;

@@ -2,14 +2,13 @@ package com.hidra.bitcoingold.controller;
 
 
 import com.hidra.bitcoingold.domain.User;
-import com.hidra.bitcoingold.dtos.RegisterUserPostRequest;
-import com.hidra.bitcoingold.dtos.TokenResponse;
-import com.hidra.bitcoingold.dtos.UserLoginRequest;
-import com.hidra.bitcoingold.dtos.UserResponse;
+import com.hidra.bitcoingold.dtos.user.RegisterUserPostRequest;
+import com.hidra.bitcoingold.dtos.user.TokenResponse;
+import com.hidra.bitcoingold.dtos.user.UserLoginRequest;
+import com.hidra.bitcoingold.dtos.user.UserResponse;
 import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.mapper.UserMapper;
 import com.hidra.bitcoingold.security.TokenService;
-import com.hidra.bitcoingold.service.AdminService;
 import com.hidra.bitcoingold.service.AuthorizationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
-    private final AdminService adminService;
     private final TokenService tokenService;
     private final AuthorizationService authorizationService;
 
