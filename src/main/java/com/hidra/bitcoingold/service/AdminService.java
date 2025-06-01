@@ -16,6 +16,7 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final WalletService walletService;
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -28,18 +29,15 @@ public class AdminService {
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (user.getRole() == null) throw new BadRequestException("Role is required");
+        String walletId = walletService.createWallet();
+        user.setWalletId(walletId);
         userRepository.save(user);
         return user;
     }
 
     public void updateUser(User user) {
         User savedUser = findById(user.getId());
-        if (user.getEmail() != null) savedUser.setEmail(user.getEmail());
-        if (user.getName() != null) savedUser.setName(user.getName());
-        if (user.getPassword() != null) {
-            String encode = passwordEncoder.encode(user.getPassword());
-            savedUser.setPassword(encode);
-        }
+        UserService.updateFields(user, savedUser, passwordEncoder);
         if (user.getRole() != null) savedUser.setRole(user.getRole());
         userRepository.save(savedUser);
     }

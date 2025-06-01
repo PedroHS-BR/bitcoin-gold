@@ -17,6 +17,7 @@ public class AuthorizationService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final WalletService walletService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -26,6 +27,8 @@ public class AuthorizationService implements UserDetailsService {
     public User createRegularuser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRole.USER);
+        String walletId = walletService.createWallet();
+        user.setWalletId(walletId);
         userRepository.save(user);
         return user;
     }

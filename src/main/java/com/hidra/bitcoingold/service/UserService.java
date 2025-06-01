@@ -27,14 +27,18 @@ public class UserService {
 
     public User updateUser(User user) {
         User savedUser = getRegularUser();
+        updateFields(user, savedUser, passwordEncoder);
+        userRepository.save(savedUser);
+        return savedUser;
+    }
+
+    static void updateFields(User user, User savedUser, PasswordEncoder passwordEncoder) {
         if (user.getEmail() != null) savedUser.setEmail(user.getEmail());
         if (user.getName() != null) savedUser.setName(user.getName());
         if (user.getPassword() != null) {
             String encode = passwordEncoder.encode(user.getPassword());
             savedUser.setPassword(encode);
         }
-        userRepository.save(savedUser);
-        return savedUser;
     }
 
     public User deleteUser() {
