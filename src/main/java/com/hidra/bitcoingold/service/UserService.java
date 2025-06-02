@@ -15,6 +15,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final WalletService walletService;
 
     public User getRegularUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -43,6 +44,7 @@ public class UserService {
 
     public User deleteUser() {
         User regularUser = getRegularUser();
+        walletService.deleteWallet(regularUser.getWalletId());
         userRepository.delete(regularUser);
         return regularUser;
     }
