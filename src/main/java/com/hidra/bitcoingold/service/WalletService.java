@@ -6,6 +6,7 @@ import com.hidra.bitcoingold.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -38,8 +39,22 @@ public class WalletService {
         }
     }
 
+    public Wallet getWallet(UUID uuid) {
+        return walletRepository.findById(uuid).orElseThrow(() -> new BadRequestException("Wallet not found"));
+    }
+
     public void deleteWallet(String walletId) {
         Wallet wallet = getWallet(walletId);
         walletRepository.delete(wallet);
+    }
+
+    public void updateBalance(Wallet source, Wallet destination, BigDecimal amount) {
+        if (source.getBalance().compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Source balance must be greater than or equal to transaction value");
+        }
+        source.setBalance(source.getBalance().subtract(amount));
+        destination.setBalance(destination.getBalance().add(amount));
+        walletRepository.save(source);
+        walletRepository.save(destination);
     }
 }
