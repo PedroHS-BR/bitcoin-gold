@@ -48,6 +48,7 @@ O projeto adota arquitetura stateless para facilitar escalabilidade e integra√ß√
 ## Contato
 
 Pedro Henrique Silva  
+[Meu LinkedIn](https://www.linkedin.com/in/seu-usuario/)
 [github.com/PedroHS-BR](https://github.com/PedroHS-BR)  
 pedro.hsilva.pe@gmail.com
 
