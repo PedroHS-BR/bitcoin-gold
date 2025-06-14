@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = { @Index(name = "idx_transaction_status", columnList = "status") })
 public class Transaction {
 
     @Id
@@ -30,5 +31,11 @@ public class Transaction {
 
     @Column(nullable = false)
     private BigDecimal amount;
+
+    private TransactionStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "source_block")
+    private Block block;
 
 }
