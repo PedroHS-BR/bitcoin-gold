@@ -34,6 +34,7 @@ public class SecurityConfigurations {
                         .requestMatchers("/user/**").authenticated()
                         .requestMatchers("/transaction/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/block/test").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

@@ -5,7 +5,7 @@ import com.hidra.bitcoingold.domain.TransactionStatus;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record TransactionResponse(
+public record TransactionRequest(
         Long id,
         UUID source,
         UUID destination,
