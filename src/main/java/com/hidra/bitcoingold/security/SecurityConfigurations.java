@@ -31,10 +31,10 @@ public class SecurityConfigurations {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/block/test").permitAll()
                         .requestMatchers("/user/**").authenticated()
                         .requestMatchers("/transaction/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/block/test").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

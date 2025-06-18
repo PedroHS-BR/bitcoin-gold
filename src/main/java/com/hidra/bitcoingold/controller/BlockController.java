@@ -1,22 +1,17 @@
 package com.hidra.bitcoingold.controller;
 
-import com.hidra.bitcoingold.domain.Transaction;
+import com.hidra.bitcoingold.domain.Block;
 import com.hidra.bitcoingold.dtos.wallet.BlockMinedResponse;
 import com.hidra.bitcoingold.dtos.wallet.MineBlockRequest;
-import com.hidra.bitcoingold.dtos.wallet.TransactionRequest;
 import com.hidra.bitcoingold.exception.BadRequestException;
-import com.hidra.bitcoingold.mapper.TransactionMapper;
-import com.hidra.bitcoingold.service.BlockService;
+import com.hidra.bitcoingold.repository.BlockRepository;
 import com.hidra.bitcoingold.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/block")
@@ -24,6 +19,7 @@ import java.util.List;
 public class BlockController {
 
     private final TransactionService transactionService;
+    private final BlockRepository blockRepository;
 
     @PostMapping
     public ResponseEntity<BlockMinedResponse> mineBlock(@RequestBody MineBlockRequest request) {
@@ -34,11 +30,14 @@ public class BlockController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/test")
-    public String testFunctionality(@RequestBody List<TransactionRequest> transactionRequests) {
-        boolean b = transactionService.validateTransactionsData(transactionRequests);
-        if (b) return "deu bom";
-        else return "deu ruim";
+    @GetMapping("/test")
+    public void testFunctionality() {
+        Block block = Block.builder()
+                .blockHash("0000490a0bf3c4dddbc8ee424996c9990a80978fc2b1e6b48632ab3395685609")
+                .timestamp(Instant.ofEpochMilli(1750287287630L))
+                .nonce(51680)
+                .build();
+        blockRepository.save(block);
     }
 
 }

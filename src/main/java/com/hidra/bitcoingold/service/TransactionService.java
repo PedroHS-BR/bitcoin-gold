@@ -51,20 +51,15 @@ public class TransactionService {
         if (transactions == null || transactions.isEmpty()) {
             return false;
         }
-
         List<Long> ids = transactions.stream()
                 .map(TransactionRequest::id)
                 .collect(Collectors.toList());
-
         List<Transaction> transactionsFromDb = transactionRepository.findPendingWithValidWalletsByIds(ids);
-
         if (transactionsFromDb.size() != transactions.size()) {
             return false;
         }
-
         Map<Long, Transaction> mapDb = transactionsFromDb.stream()
                 .collect(Collectors.toMap(Transaction::getId, t -> t));
-
         for (TransactionRequest tx : transactions) {
             Transaction txDb = mapDb.get(tx.id());
             if (txDb == null) {
