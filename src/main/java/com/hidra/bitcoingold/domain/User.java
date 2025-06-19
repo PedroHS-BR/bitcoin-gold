@@ -18,6 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
