@@ -35,7 +35,7 @@ public class SecurityConfigurations {
                         .requestMatchers("/user/**").authenticated()
                         .requestMatchers("/transaction/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
