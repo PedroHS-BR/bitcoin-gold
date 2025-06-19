@@ -13,7 +13,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("""
         SELECT t FROM Transaction t
         WHERE t.id IN :ids
-        AND t.status = 'PENDING'
         AND t.source.uuid IS NOT NULL
         AND t.destination.uuid IS NOT NULL
     """)
@@ -21,3 +20,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findTop100ByStatus(TransactionStatus status);
 }
+
+//AND t.status = com.hidra.bitcoingold.domain.TransactionStatus.PENDING

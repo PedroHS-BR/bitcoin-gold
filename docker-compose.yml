@@ -1,13 +1,15 @@
+version: "3.8"
 services:
   db:
-    image: mysql
-    container_name: bitcoingold_mysql
+    image: postgres:15
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: bitcoingoldpostgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: examplepassword
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - bitcoingold_data:/var/lib/mysql
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  bitcoingold_data:
+  pgdata:
