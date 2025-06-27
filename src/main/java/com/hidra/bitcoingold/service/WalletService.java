@@ -1,7 +1,9 @@
 package com.hidra.bitcoingold.service;
 
+import com.hidra.bitcoingold.domain.User;
 import com.hidra.bitcoingold.domain.Wallet;
 import com.hidra.bitcoingold.exception.BadRequestException;
+import com.hidra.bitcoingold.repository.UserRepository;
 import com.hidra.bitcoingold.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ public class WalletService {
 
     private final WalletRepository walletRepository;
     private final AESUtil aesUtil;
+    private final UserRepository userRepository;
 
     public String createWallet()  {
         Wallet wallet = new Wallet();
@@ -37,6 +40,11 @@ public class WalletService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Wallet getWalletByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException("User not found"));
+        return getWallet(user.getWalletId());
     }
 
     public Wallet getWallet(UUID uuid) {

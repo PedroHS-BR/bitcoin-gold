@@ -25,7 +25,7 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<TransactionResponse> createTransaction(@RequestBody CreateTransactionRequest request) {
-        Wallet wallet = walletService.getWallet(request.destination());
+        Wallet wallet = walletService.getWalletByEmail(request.destination());
         Transaction transaction = transactionService.createTransaction(wallet.getUuid(), request.amount());
         TransactionResponse transactionResponse = TransactionMapper.toTransactionResponse(transaction);
         return new ResponseEntity<>(transactionResponse, HttpStatus.CREATED);
