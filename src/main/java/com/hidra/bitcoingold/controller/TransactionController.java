@@ -37,4 +37,17 @@ public class TransactionController {
         List<TransactionResponse> transactionResponseList = TransactionMapper.toTransactionResponseList(all);
         return new ResponseEntity<>(transactionResponseList, HttpStatus.OK);
     }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<TransactionResponse>> getUserTransactions() {
+        List<Transaction> userTransactions = transactionService.getUserTransactions();
+        List<TransactionResponse> transactionResponseList = TransactionMapper.toTransactionResponseList(userTransactions);
+        return new ResponseEntity<>(transactionResponseList, HttpStatus.OK);
+    }
+
+//    @GetMapping("/teste")
+//    public ResponseEntity<List<Transaction>> teste() {
+//        List<Transaction> userTransactions = transactionService.getUserTransactions(user);
+//        return new ResponseEntity<>(userTransactions, HttpStatus.OK);
+//    }
 }

@@ -4,17 +4,15 @@ import com.hidra.bitcoingold.domain.Transaction;
 import com.hidra.bitcoingold.domain.TransactionStatus;
 import com.hidra.bitcoingold.domain.User;
 import com.hidra.bitcoingold.domain.Wallet;
-import com.hidra.bitcoingold.dtos.wallet.TransactionRequest;
-import com.hidra.bitcoingold.dtos.wallet.TransactionResponse;
+import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.TransactionRepository;
+import com.hidra.bitcoingold.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,15 +21,18 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserService userService;
     private final WalletService walletService;
+    private final WalletRepository walletRepository;
 
     public Transaction createTransaction(UUID destination, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
         Wallet destinationWallet = walletService.getWallet(destination);
         User user = userService.getRegularUser();
         Wallet sourceWallet = walletService.getWallet(user.getWalletId());
-        //walletService.updateBalance(sourceWallet, destinationWallet, amount);
+        if (amount.add(unexpentBalance()).compareTo(sourceWallet.getBalance()) > 0) {
+            throw new BadRequestException("You don't have enough balance");
+        }
         Transaction transaction = Transaction.builder()
                 .source(sourceWallet)
                 .destination(destinationWallet)
@@ -46,40 +47,45 @@ public class TransactionService {
         return transactionRepository.findTop100ByStatus(TransactionStatus.PENDING);
     }
 
-
-    public boolean validateTransactionsData(List<TransactionRequest> transactions) {
-        if (transactions == null || transactions.isEmpty()) {
-            return false;
-        }
-        List<Long> ids = transactions.stream()
-                .map(TransactionRequest::id)
-                .collect(Collectors.toList());
-        List<Transaction> transactionsFromDb = transactionRepository.findPendingWithValidWalletsByIds(ids);
-        if (transactionsFromDb.size() != transactions.size()) {
-            return false;
-        }
-        Map<Long, Transaction> mapDb = transactionsFromDb.stream()
-                .collect(Collectors.toMap(Transaction::getId, t -> t));
-        for (TransactionRequest tx : transactions) {
-            Transaction txDb = mapDb.get(tx.id());
-            if (txDb == null) {
-                return false;
-            }
-            if (!tx.source().equals(txDb.getSource().getUuid())) {
-                return false;
-            }
-            if (!tx.destination().equals(txDb.getDestination().getUuid())) {
-                return false;
-            }
-            if (tx.amount() == null || txDb.getAmount() == null || tx.amount().compareTo(txDb.getAmount()) != 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public List<Transaction> findAll() {
         return transactionRepository.findAll();
+    }
+
+    public List<Transaction> getUserPendingTransactions() {
+        User user = userService.getRegularUser();
+        Wallet wallet = walletService.getWallet(user.getWalletId());
+        return transactionRepository.findBySourceAndStatus(wallet, TransactionStatus.PENDING);
+    }
+
+    public List<Transaction> getUserTransactions() {
+        User user = userService.getRegularUser();
+        Wallet wallet = walletService.getWallet(user.getWalletId());
+        return transactionRepository.findBySource(wallet);
+    }
+
+    public BigDecimal unexpentBalance() {
+        List<Transaction> userTransactions = getUserPendingTransactions();
+        BigDecimal unexpentTransactions = BigDecimal.ZERO;
+        for (Transaction transaction : userTransactions) {
+            unexpentTransactions = transaction.getAmount().add(unexpentTransactions);
+        }
+        return unexpentTransactions;
+    }
+
+    public boolean updateBalance(Transaction transaction) {
+        Wallet source = transaction.getSource();
+        Wallet destination = transaction.getDestination();
+        if(source.getBalance().compareTo(transaction.getAmount()) < 0) {
+            transaction.setStatus(TransactionStatus.INVALID);
+            transactionRepository.save(transaction);
+            return false;
+        }
+        source.setBalance(source.getBalance().subtract(transaction.getAmount()));
+        destination.setBalance(destination.getBalance().add(transaction.getAmount()));
+        walletRepository.save(source);
+        walletRepository.save(destination);
+        transaction.setStatus(TransactionStatus.MINED);
+        transactionRepository.save(transaction);
+        return true;
     }
 }
