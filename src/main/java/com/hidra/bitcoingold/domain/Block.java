@@ -3,6 +3,7 @@ package com.hidra.bitcoingold.domain;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
@@ -11,6 +12,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Block {
 
     @Id
@@ -25,7 +27,7 @@ public class Block {
 
     private long nonce;
 
-    private Instant timestamp;
+    private String timestamp;
 
     @ManyToOne
     @JoinColumn(name = "miner_wallet_uuid")
