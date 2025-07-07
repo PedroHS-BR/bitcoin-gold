@@ -17,5 +17,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findBySourceAndStatus(Wallet source, TransactionStatus status);
 
     List<Transaction> findBySource(Wallet source);
+
+    List<Transaction> findTop100ByStatusOrderByIdAsc(TransactionStatus status);
 }
 

@@ -72,20 +72,29 @@ public class TransactionService {
         return unexpentTransactions;
     }
 
-    public boolean updateBalance(Transaction transaction) {
-        Wallet source = transaction.getSource();
-        Wallet destination = transaction.getDestination();
-        if(source.getBalance().compareTo(transaction.getAmount()) < 0) {
-            transaction.setStatus(TransactionStatus.INVALID);
+    public Transaction updateBalance(List<Transaction> transactions) {
+        boolean isMiner = false;
+        Transaction MinerTransaction = null;
+        for (Transaction transaction : transactions) {
+            Wallet source = transaction.getSource();
+            Wallet destination = transaction.getDestination();
+            if (source.getBalance().compareTo(transaction.getAmount()) < 0) {
+                transaction.setStatus(TransactionStatus.INVALID);
+                transactionRepository.save(transaction);
+                System.out.println("Invalid transaction");
+                continue;
+            }
+            source.setBalance(source.getBalance().subtract(transaction.getAmount()));
+            destination.setBalance(destination.getBalance().add(transaction.getAmount()));
+            walletRepository.save(source);
+            walletRepository.save(destination);
+            transaction.setStatus(TransactionStatus.MINED);
             transactionRepository.save(transaction);
-            return false;
+            if (!isMiner && transaction.getAmount().compareTo(new BigDecimal("10")) >= 0) {
+                isMiner = true;
+                MinerTransaction = transaction;
+            }
         }
-        source.setBalance(source.getBalance().subtract(transaction.getAmount()));
-        destination.setBalance(destination.getBalance().add(transaction.getAmount()));
-        walletRepository.save(source);
-        walletRepository.save(destination);
-        transaction.setStatus(TransactionStatus.MINED);
-        transactionRepository.save(transaction);
-        return true;
+        return MinerTransaction;
     }
 }

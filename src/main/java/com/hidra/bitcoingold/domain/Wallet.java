@@ -19,4 +19,9 @@ public class Wallet {
         this.uuid = UUID.randomUUID();
         balance = BigDecimal.ZERO;
     }
+
+    public Wallet(BigDecimal balance) {
+        this.balance = balance;
+        this.uuid = UUID.randomUUID();
+    }
 }

@@ -1,6 +1,7 @@
 package com.hidra.bitcoingold.controller;
 
 import com.hidra.bitcoingold.domain.Block;
+import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.BlockRepository;
 import com.hidra.bitcoingold.service.BlockService;
 import com.hidra.bitcoingold.service.TransactionService;
@@ -27,8 +28,8 @@ public class BlockController {
     }
 
     @GetMapping
-    public String teste(){
-        return blockService.ValidateBlock();
+    public Block teste(){
+        return blockRepository.findTopByOrderByIdDesc().orElseThrow(() -> new BadRequestException("Block not found"));
     }
 
 

@@ -3,6 +3,7 @@ package com.hidra.bitcoingold.service;
 import com.hidra.bitcoingold.domain.Block;
 import com.hidra.bitcoingold.domain.Transaction;
 import com.hidra.bitcoingold.domain.TransactionStatus;
+import com.hidra.bitcoingold.domain.Wallet;
 import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.BlockRepository;
 import com.hidra.bitcoingold.repository.TransactionRepository;
@@ -28,25 +29,47 @@ public class BlockService {
 
     public void mineBlock() {
         List<Transaction> pendingTransactions = transactionService.getPendingTransactions();
-        for (Transaction transaction : pendingTransactions) {
-            if (!transactionService.updateBalance(transaction)){
-                System.out.println("Invalid transaction");
-            }
+        if (pendingTransactions.isEmpty()) {
+            throw new BadRequestException("No pending transactions found");
         }
-        Block block = calculateBlockHash();
+        Transaction MinerTransaction = transactionService.updateBalance(pendingTransactions);
+        Block block = createBlock(pendingTransactions, MinerTransaction);
         blockRepository.save(block);
 
     }
 
-    public Block calculateBlockHash() {
+    public Block createBlock(List<Transaction> transactions, Transaction minerTransaction) {
+        Block previousBlock = blockRepository.findTopByOrderByIdDesc()
+                .orElseThrow(() -> new BadRequestException("Block not found"));
+
+        if (minerTransaction != null) {
+            Wallet source = minerTransaction.getSource();
+
+        }
+
+        String previousHash = previousBlock.getBlockHash();
+        String TransactionsHash = transactions.isEmpty() ? "" : calculateTransactionsHash(transactions);
+        String timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS).toString();
+        return null;
+    }
+
+
+
+    public Block createGenesisBlock() {
+        List<Block> all = blockRepository.findAll();
+        if (!all.isEmpty()) {
+            throw new BadRequestException("Block already exists");
+        }
         int nonce = 0;
-        String timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS).toString();;
+        String timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS).toString();
         String hash;
         do {
             nonce++;
             String dataToHash = nonce + timestamp;
             hash = sha256(dataToHash);
         } while (!hash.startsWith("0000"));
+
+        Wallet genesisWallet = new Wallet();
 
         return Block.builder()
                 .blockHash(hash)
@@ -55,12 +78,11 @@ public class BlockService {
                 .build();
     }
 
-    public String ValidateBlock() {
-        Block byId = blockRepository.findById(1L).orElseThrow(
+    public String ValidateBlock(Long blockId) {
+        Block byId = blockRepository.findById(blockId).orElseThrow(
                 () -> new BadRequestException("Block not found"));
         String dataToHash = byId.getNonce() + byId.getTimestamp();
-        System.out.println(byId.getTimestamp());
-        System.out.println(byId.getNonce());
+
         return sha256(dataToHash);
     }
 
@@ -82,5 +104,16 @@ public class BlockService {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Erro ao calcular hash SHA-256", e);
         }
+    }
+
+    public String calculateTransactionsHash(List<Transaction> transactions) {
+        StringBuilder sb = new StringBuilder();
+        for (Transaction tx : transactions) {
+            sb.append(tx.getId())
+                    .append(tx.getSource().getUuid())
+                    .append(tx.getDestination().getUuid())
+                    .append(tx.getAmount().toPlainString());
+        }
+        return sha256(sb.toString());
     }
 }
