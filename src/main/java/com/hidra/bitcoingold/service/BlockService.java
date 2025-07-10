@@ -33,13 +33,29 @@ public class BlockService {
         return blockRepository.count() == 0;
     }
 
+    public String ValidateBlock(Long blockId) {
+        Block block = blockRepository.findById(blockId).orElseThrow(
+                () -> new BadRequestException("Block not found"));
+
+        String previousHash = block.getPreviousHash();
+        List<Transaction> transactions = transactionService.getTransactionsByBlock(block);
+        String transactionsHash = transactions.isEmpty() ? "" : calculateTransactionsHash(transactions);
+
+        long nonce = block.getNonce();
+        String timestamp = block.getTimestamp();
+        Wallet miner = block.getMiner();
+
+        String s = sha256(previousHash + transactionsHash + nonce + timestamp + miner.getUuid().toString());
+        if (s.equals(block.getBlockHash())) return "Valid block, Block hash: " + s;
+        else return "Invalid block, generated hash: " + s;
+    }
+
     public Block createBlock() {
         Block previousBlock = blockRepository.findTopByOrderByIdDesc()
                 .orElseThrow(() -> new BadRequestException("Block not found"));
 
         List<Transaction> transactions = transactionService.getPendingTransactions();
-        Transaction minerTransaction = transactionService.updateBalance(transactions);
-
+        Transaction minerTransaction = transactionService.pickMinerTransaction(transactions);
         String miner;
         if (minerTransaction != null) {
             Wallet source = minerTransaction.getSource();
@@ -59,7 +75,7 @@ public class BlockService {
             hash = sha256(previousHash + transactionsHash + nonce + timestamp + miner);
         } while (!hash.startsWith("0000"));
 
-        return blockRepository.save(Block.builder()
+        Block createdBlock = blockRepository.save(Block.builder()
                 .blockHash(hash)
                 .previousHash(previousHash)
                 .transactionHash(transactionsHash)
@@ -67,9 +83,8 @@ public class BlockService {
                 .timestamp(timestamp)
                 .nonce(nonce)
                 .build());
-
-
-
+        transactionService.updateBalance(transactions, createdBlock);
+        return createdBlock;
     }
 
     public void createGenesisBlock() {
@@ -103,15 +118,6 @@ public class BlockService {
         blockRepository.save(build);
     }
 
-    public String ValidateBlock(Long blockId) {
-        Block byId = blockRepository.findById(blockId).orElseThrow(
-                () -> new BadRequestException("Block not found"));
-        String dataToHash = byId.getNonce() + byId.getTimestamp();
-
-        return sha256(dataToHash);
-    }
-
-
     public String sha256(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -140,5 +146,9 @@ public class BlockService {
                     .append(tx.getAmount().toPlainString());
         }
         return sha256(sb.toString());
+    }
+
+    public Block getBlock(long id) {
+        return blockRepository.getBlockById(id).orElseThrow(() -> new BadRequestException("Block not found"));
     }
 }

@@ -1,5 +1,6 @@
 package com.hidra.bitcoingold.repository;
 
+import com.hidra.bitcoingold.domain.Block;
 import com.hidra.bitcoingold.domain.Transaction;
 import com.hidra.bitcoingold.domain.TransactionStatus;
 import com.hidra.bitcoingold.domain.Wallet;
@@ -19,5 +20,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findBySource(Wallet source);
 
     List<Transaction> findTop100ByStatusOrderByIdAsc(TransactionStatus status);
+
+    List<Transaction> findByBlock(Block block);
 }
 

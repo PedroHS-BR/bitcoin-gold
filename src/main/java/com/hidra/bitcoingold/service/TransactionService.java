@@ -1,9 +1,6 @@
 package com.hidra.bitcoingold.service;
 
-import com.hidra.bitcoingold.domain.Transaction;
-import com.hidra.bitcoingold.domain.TransactionStatus;
-import com.hidra.bitcoingold.domain.User;
-import com.hidra.bitcoingold.domain.Wallet;
+import com.hidra.bitcoingold.domain.*;
 import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.TransactionRepository;
 import com.hidra.bitcoingold.repository.WalletRepository;
@@ -75,9 +72,7 @@ public class TransactionService {
         return unexpentTransactions;
     }
 
-    public Transaction updateBalance(List<Transaction> transactions) {
-        boolean isMiner = false;
-        Transaction MinerTransaction = null;
+    public void updateBalance(List<Transaction> transactions, Block transactionBlock) {
         for (Transaction transaction : transactions) {
             Wallet source = transaction.getSource();
             Wallet destination = transaction.getDestination();
@@ -92,12 +87,21 @@ public class TransactionService {
             walletRepository.save(source);
             walletRepository.save(destination);
             transaction.setStatus(TransactionStatus.MINED);
+            transaction.setBlock(transactionBlock);
             transactionRepository.save(transaction);
-            if (!isMiner && transaction.getAmount().compareTo(new BigDecimal("10")) >= 0) {
-                isMiner = true;
-                MinerTransaction = transaction;
+        }
+    }
+
+    public Transaction pickMinerTransaction(List<Transaction> transactions) {
+        for (Transaction transaction : transactions) {
+            if (transaction.getAmount().compareTo(new BigDecimal("10")) >= 0) {
+                return transaction;
             }
         }
-        return MinerTransaction;
+        return null;
+    }
+
+    public List<Transaction> getTransactionsByBlock(Block block){
+        return transactionRepository.findByBlock(block);
     }
 }

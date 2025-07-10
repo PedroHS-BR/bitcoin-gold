@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/block")
 @RequiredArgsConstructor
@@ -26,7 +28,17 @@ public class BlockController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Block> getBlock(@PathVariable long id) {
+        return new ResponseEntity<>(blockService.getBlock(id), HttpStatus.OK);
+    }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<Block>> getAllBlocks() {
+        return new ResponseEntity<>(blockRepository.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/validate/{id}")
+    public ResponseEntity<String> validateBlock(@PathVariable long id) {
+        return new ResponseEntity<>(blockService.ValidateBlock(id), HttpStatus.OK);
     }
 
 }
