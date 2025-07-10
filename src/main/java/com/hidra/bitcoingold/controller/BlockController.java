@@ -1,16 +1,13 @@
 package com.hidra.bitcoingold.controller;
 
 import com.hidra.bitcoingold.domain.Block;
-import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.BlockRepository;
 import com.hidra.bitcoingold.service.BlockService;
 import com.hidra.bitcoingold.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/block")
@@ -22,15 +19,14 @@ public class BlockController {
     private final BlockService blockService;
 
     @PostMapping
-    public ResponseEntity<String> MineBlock() {
-        blockService.mineBlock();
-        return ResponseEntity.ok("Block mined");
+    public ResponseEntity<Block> MineBlock() {
+        Block block = blockService.createBlock();
+        return new ResponseEntity<>(block, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public Block teste(){
-        return blockRepository.findTopByOrderByIdDesc().orElseThrow(() -> new BadRequestException("Block not found"));
-    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Block> getBlock(@PathVariable long id) {
 
+    }
 
 }

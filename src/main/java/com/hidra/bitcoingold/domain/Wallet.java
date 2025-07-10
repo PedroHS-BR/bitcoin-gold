@@ -1,6 +1,8 @@
 package com.hidra.bitcoingold.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +11,8 @@ import java.util.UUID;
 
 @Entity
 @Data
+@AllArgsConstructor
+@Builder
 public class Wallet {
     @Id
     private UUID uuid;

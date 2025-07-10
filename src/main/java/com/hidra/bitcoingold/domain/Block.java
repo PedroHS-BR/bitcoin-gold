@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 @Entity
 @Builder
 @NoArgsConstructor
@@ -31,5 +29,5 @@ public class Block {
 
     @ManyToOne
     @JoinColumn(name = "miner_wallet_uuid")
-    private Wallet Miner;
+    private Wallet miner;
 }

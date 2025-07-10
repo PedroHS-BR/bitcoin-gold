@@ -2,22 +2,22 @@ package com.hidra.bitcoingold.service;
 
 import com.hidra.bitcoingold.domain.Block;
 import com.hidra.bitcoingold.domain.Transaction;
-import com.hidra.bitcoingold.domain.TransactionStatus;
 import com.hidra.bitcoingold.domain.Wallet;
 import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.BlockRepository;
 import com.hidra.bitcoingold.repository.TransactionRepository;
+import com.hidra.bitcoingold.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,56 +26,81 @@ public class BlockService {
     private final BlockRepository blockRepository;
     private final TransactionService transactionService;
     private final TransactionRepository transactionRepository;
+    private final WalletRepository walletRepository;
+    private final WalletService walletService;
 
-    public void mineBlock() {
-        List<Transaction> pendingTransactions = transactionService.getPendingTransactions();
-        if (pendingTransactions.isEmpty()) {
-            throw new BadRequestException("No pending transactions found");
-        }
-        Transaction MinerTransaction = transactionService.updateBalance(pendingTransactions);
-        Block block = createBlock(pendingTransactions, MinerTransaction);
-        blockRepository.save(block);
-
+    public boolean isBlockchainEmpty() {
+        return blockRepository.count() == 0;
     }
 
-    public Block createBlock(List<Transaction> transactions, Transaction minerTransaction) {
+    public Block createBlock() {
         Block previousBlock = blockRepository.findTopByOrderByIdDesc()
                 .orElseThrow(() -> new BadRequestException("Block not found"));
 
+        List<Transaction> transactions = transactionService.getPendingTransactions();
+        Transaction minerTransaction = transactionService.updateBalance(transactions);
+
+        String miner;
         if (minerTransaction != null) {
             Wallet source = minerTransaction.getSource();
-
+            miner = source.getUuid().toString();
         }
+        else miner = "84741a3d-ff44-45fe-af84-fe9e05079ef8";
+
 
         String previousHash = previousBlock.getBlockHash();
-        String TransactionsHash = transactions.isEmpty() ? "" : calculateTransactionsHash(transactions);
+        String transactionsHash = transactions.isEmpty() ? "" : calculateTransactionsHash(transactions);
         String timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS).toString();
-        return null;
+
+        String hash;
+        int nonce = 0;
+        do {
+            nonce++;
+            hash = sha256(previousHash + transactionsHash + nonce + timestamp + miner);
+        } while (!hash.startsWith("0000"));
+
+        return blockRepository.save(Block.builder()
+                .blockHash(hash)
+                .previousHash(previousHash)
+                .transactionHash(transactionsHash)
+                .miner(walletService.getWallet(UUID.fromString(miner)))
+                .timestamp(timestamp)
+                .nonce(nonce)
+                .build());
+
+
+
     }
 
-
-
-    public Block createGenesisBlock() {
+    public void createGenesisBlock() {
         List<Block> all = blockRepository.findAll();
+        UUID bankId = UUID.fromString("84741a3d-ff44-45fe-af84-fe9e05079ef8");
+        Wallet bankWallet = Wallet.builder()
+                .uuid(bankId)
+                .balance(BigDecimal.valueOf(1_000_000))
+                .build();
+        walletRepository.save(bankWallet);
         if (!all.isEmpty()) {
             throw new BadRequestException("Block already exists");
         }
-        int nonce = 0;
         String timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS).toString();
+        String miner = bankWallet.getUuid().toString();
         String hash;
+        int nonce = 0;
         do {
             nonce++;
-            String dataToHash = nonce + timestamp;
-            hash = sha256(dataToHash);
+            hash = sha256(nonce + timestamp + miner);
         } while (!hash.startsWith("0000"));
 
-        Wallet genesisWallet = new Wallet();
-
-        return Block.builder()
+        Block build = Block.builder()
                 .blockHash(hash)
+                .previousHash("")
+                .transactionHash("")
+                .miner(bankWallet)
                 .timestamp(timestamp)
                 .nonce(nonce)
                 .build();
+        blockRepository.save(build);
     }
 
     public String ValidateBlock(Long blockId) {

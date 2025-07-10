@@ -30,6 +30,9 @@ public class TransactionService {
         Wallet destinationWallet = walletService.getWallet(destination);
         User user = userService.getRegularUser();
         Wallet sourceWallet = walletService.getWallet(user.getWalletId());
+        if (sourceWallet.getUuid().equals(destinationWallet.getUuid())) {
+            throw new BadRequestException("You can't send money to yourself");
+        }
         if (amount.add(unexpentBalance()).compareTo(sourceWallet.getBalance()) > 0) {
             throw new BadRequestException("You don't have enough balance");
         }
