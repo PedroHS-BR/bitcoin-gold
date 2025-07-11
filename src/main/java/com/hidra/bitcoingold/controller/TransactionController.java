@@ -45,6 +45,13 @@ public class TransactionController {
         return new ResponseEntity<>(transactionResponseList, HttpStatus.OK);
     }
 
+    @GetMapping("/pending")
+    public ResponseEntity<List<TransactionResponse>> getPendingTransactions() {
+        List<Transaction> pendingTransactions = transactionService.getPendingTransactions();
+        List<TransactionResponse> transactionResponseList = TransactionMapper.toTransactionResponseList(pendingTransactions);
+        return new ResponseEntity<>(transactionResponseList, HttpStatus.OK);
+    }
+
 //    @GetMapping("/teste")
 //    public ResponseEntity<List<Transaction>> teste() {
 //        List<Transaction> userTransactions = transactionService.getUserTransactions(user);

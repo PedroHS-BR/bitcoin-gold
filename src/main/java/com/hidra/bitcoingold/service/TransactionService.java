@@ -30,7 +30,7 @@ public class TransactionService {
         if (sourceWallet.getUuid().equals(destinationWallet.getUuid())) {
             throw new BadRequestException("You can't send money to yourself");
         }
-        if (amount.add(unexpentBalance()).compareTo(sourceWallet.getBalance()) > 0) {
+        if (amount.add(unspentBalance()).compareTo(sourceWallet.getBalance()) > 0) {
             throw new BadRequestException("You don't have enough balance");
         }
         Transaction transaction = Transaction.builder()
@@ -41,6 +41,28 @@ public class TransactionService {
                 .status(TransactionStatus.PENDING)
                 .build();
         return transactionRepository.save(transaction);
+    }
+
+    public void createMinerTransaction(UUID destination) {
+        Wallet bankWallet = walletService.getWallet(UUID.fromString("84741a3d-ff44-45fe-af84-fe9e05079ef8"));
+        Wallet wallet = walletService.getWallet(destination);
+        List<Transaction> bySourceAndStatus = transactionRepository.findBySourceAndStatus(bankWallet, TransactionStatus.PENDING);
+        BigDecimal unspentBalance = BigDecimal.ZERO;
+        for (Transaction transaction : bySourceAndStatus) {
+            unspentBalance = unspentBalance.add(transaction.getAmount());
+        }
+        if (unspentBalance.add(BigDecimal.valueOf(50)).compareTo(wallet.getBalance()) > 0) {
+            return;
+        }
+
+        Transaction minerTransaction = Transaction.builder()
+                .source(bankWallet)
+                .destination(wallet)
+                .amount(BigDecimal.valueOf(50))
+                .block(null)
+                .status(TransactionStatus.PENDING)
+                .build();
+        transactionRepository.save(minerTransaction);
     }
 
     public List<Transaction> getPendingTransactions() {
@@ -63,13 +85,13 @@ public class TransactionService {
         return transactionRepository.findBySource(wallet);
     }
 
-    public BigDecimal unexpentBalance() {
+    public BigDecimal unspentBalance() {
         List<Transaction> userTransactions = getUserPendingTransactions();
-        BigDecimal unexpentTransactions = BigDecimal.ZERO;
+        BigDecimal unspentTransactions = BigDecimal.ZERO;
         for (Transaction transaction : userTransactions) {
-            unexpentTransactions = transaction.getAmount().add(unexpentTransactions);
+            unspentTransactions = transaction.getAmount().add(unspentTransactions);
         }
-        return unexpentTransactions;
+        return unspentTransactions;
     }
 
     public void updateBalance(List<Transaction> transactions, Block transactionBlock) {
@@ -95,7 +117,9 @@ public class TransactionService {
     public Transaction pickMinerTransaction(List<Transaction> transactions) {
         for (Transaction transaction : transactions) {
             if (transaction.getAmount().compareTo(new BigDecimal("10")) >= 0) {
-                return transaction;
+                if (!transaction.getSource().getUuid().equals(UUID.fromString("84741a3d-ff44-45fe-af84-fe9e05079ef8"))) {
+                    return transaction;
+                }
             }
         }
         return null;

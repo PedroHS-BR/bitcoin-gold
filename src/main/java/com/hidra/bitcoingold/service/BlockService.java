@@ -60,6 +60,7 @@ public class BlockService {
         if (minerTransaction != null) {
             Wallet source = minerTransaction.getSource();
             miner = source.getUuid().toString();
+            transactionService.createMinerTransaction(source.getUuid());
         }
         else miner = "84741a3d-ff44-45fe-af84-fe9e05079ef8";
 
