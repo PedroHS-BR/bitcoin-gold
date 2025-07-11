@@ -43,6 +43,19 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
+    public void newUserBonusTransaction(User user){
+        Wallet bankWallet = walletService.getWallet(UUID.fromString("84741a3d-ff44-45fe-af84-fe9e05079ef8"));
+        Wallet userWallet = walletService.getWallet(user.getWalletId());
+        Transaction transaction = Transaction.builder()
+                .source(bankWallet)
+                .destination(userWallet)
+                .amount(BigDecimal.valueOf(50))
+                .block(null)
+                .status(TransactionStatus.PENDING)
+                .build();
+        transactionRepository.save(transaction);
+    }
+
     public void createMinerTransaction(UUID destination) {
         Wallet bankWallet = walletService.getWallet(UUID.fromString("84741a3d-ff44-45fe-af84-fe9e05079ef8"));
         Wallet wallet = walletService.getWallet(destination);

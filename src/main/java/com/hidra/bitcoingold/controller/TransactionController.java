@@ -3,7 +3,6 @@ package com.hidra.bitcoingold.controller;
 import com.hidra.bitcoingold.domain.Transaction;
 import com.hidra.bitcoingold.domain.Wallet;
 import com.hidra.bitcoingold.dtos.wallet.CreateTransactionRequest;
-import com.hidra.bitcoingold.dtos.wallet.TransactionRequest;
 import com.hidra.bitcoingold.dtos.wallet.TransactionResponse;
 import com.hidra.bitcoingold.mapper.TransactionMapper;
 import com.hidra.bitcoingold.service.TransactionService;
@@ -51,10 +50,4 @@ public class TransactionController {
         List<TransactionResponse> transactionResponseList = TransactionMapper.toTransactionResponseList(pendingTransactions);
         return new ResponseEntity<>(transactionResponseList, HttpStatus.OK);
     }
-
-//    @GetMapping("/teste")
-//    public ResponseEntity<List<Transaction>> teste() {
-//        List<Transaction> userTransactions = transactionService.getUserTransactions(user);
-//        return new ResponseEntity<>(userTransactions, HttpStatus.OK);
-//    }
 }

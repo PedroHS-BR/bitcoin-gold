@@ -10,6 +10,8 @@ import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.mapper.UserMapper;
 import com.hidra.bitcoingold.security.TokenService;
 import com.hidra.bitcoingold.service.AuthorizationService;
+import com.hidra.bitcoingold.service.TransactionService;
+import com.hidra.bitcoingold.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final AuthorizationService authorizationService;
+    private final UserService userService;
+    private final TransactionService transactionService;
 
 
     @PostMapping("/login")
@@ -43,6 +47,9 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerNewUser(@RequestBody @Valid RegisterUserPostRequest registerUserPostRequest) {
         User user = authorizationService.createRegularuser(UserMapper.INSTANCE.toUser(registerUserPostRequest));
+        if (userService.howManyUsers() <= 100){
+            transactionService.newUserBonusTransaction(user);
+        }
         return new ResponseEntity<>(UserMapper.INSTANCE.toUserResponse(user), HttpStatus.CREATED);
     }
 

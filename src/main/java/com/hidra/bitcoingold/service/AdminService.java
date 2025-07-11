@@ -44,7 +44,6 @@ public class AdminService {
 
     public void deleteUser(UUID id) {
         User byId = findById(id);
-        //walletService.deleteWallet(byId.getWalletId());
         userRepository.delete(byId);
     }
 

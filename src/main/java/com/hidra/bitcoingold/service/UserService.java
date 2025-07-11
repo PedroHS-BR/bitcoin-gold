@@ -26,6 +26,10 @@ public class UserService {
         return null;
     }
 
+    public long howManyUsers(){
+        return userRepository.count();
+    }
+
     public User updateUser(User user) {
         User savedUser = getRegularUser();
         updateFields(user, savedUser, passwordEncoder);
@@ -44,7 +48,6 @@ public class UserService {
 
     public User deleteUser() {
         User regularUser = getRegularUser();
-        walletService.deleteWallet(regularUser.getWalletId());
         userRepository.delete(regularUser);
         return regularUser;
     }

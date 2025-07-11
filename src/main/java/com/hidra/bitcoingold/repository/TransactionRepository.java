@@ -5,8 +5,6 @@ import com.hidra.bitcoingold.domain.Transaction;
 import com.hidra.bitcoingold.domain.TransactionStatus;
 import com.hidra.bitcoingold.domain.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
