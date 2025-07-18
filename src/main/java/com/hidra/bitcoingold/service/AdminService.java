@@ -31,15 +31,14 @@ public class AdminService {
         if (user.getRole() == null) throw new BadRequestException("Role is required");
         String walletId = walletService.createWallet();
         user.setWalletId(walletId);
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
-    public void updateUser(User user) {
+    public User updateUser(User user) {
         User savedUser = findById(user.getId());
         UserService.updateFields(user, savedUser, passwordEncoder);
         if (user.getRole() != null) savedUser.setRole(user.getRole());
-        userRepository.save(savedUser);
+        return userRepository.save(savedUser);
     }
 
     public void deleteUser(UUID id) {
