@@ -9,12 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,12 +28,10 @@ class AdminServiceTest {
     @Mock
     private WalletService walletService;
     private User user;
-    private User admin;
 
     @BeforeEach
     void setUp() {
         user = UserCreator.createValidUser();
-        admin = UserCreator.createAdminUser();
     }
 
     @Test

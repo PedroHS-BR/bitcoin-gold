@@ -2,10 +2,13 @@ package com.hidra.bitcoingold.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AESUtilTest {
+    @InjectMocks
+    private AESUtil util;
 
     private AESUtil aesUtil;
 

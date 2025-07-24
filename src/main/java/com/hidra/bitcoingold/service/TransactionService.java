@@ -5,6 +5,7 @@ import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.TransactionRepository;
 import com.hidra.bitcoingold.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
@@ -64,10 +66,9 @@ public class TransactionService {
         for (Transaction transaction : bySourceAndStatus) {
             unspentBalance = unspentBalance.add(transaction.getAmount());
         }
-        if (unspentBalance.add(BigDecimal.valueOf(50)).compareTo(wallet.getBalance()) > 0) {
+        if (unspentBalance.add(BigDecimal.valueOf(50)).compareTo(bankWallet.getBalance()) > 0) {
             return;
         }
-
         Transaction minerTransaction = Transaction.builder()
                 .source(bankWallet)
                 .destination(wallet)
@@ -114,7 +115,7 @@ public class TransactionService {
             if (source.getBalance().compareTo(transaction.getAmount()) < 0) {
                 transaction.setStatus(TransactionStatus.INVALID);
                 transactionRepository.save(transaction);
-                System.out.println("Invalid transaction");
+                log.warn("Invalid transaction from wallet {}", source.getUuid());
                 continue;
             }
             source.setBalance(source.getBalance().subtract(transaction.getAmount()));

@@ -15,7 +15,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final WalletService walletService;
 
     public User getRegularUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -33,8 +32,7 @@ public class UserService {
     public User updateUser(User user) {
         User savedUser = getRegularUser();
         updateFields(user, savedUser, passwordEncoder);
-        userRepository.save(savedUser);
-        return savedUser;
+        return userRepository.save(savedUser);
     }
 
     static void updateFields(User user, User savedUser, PasswordEncoder passwordEncoder) {

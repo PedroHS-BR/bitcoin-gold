@@ -38,7 +38,7 @@ public class WalletService {
             return walletRepository.findById(UUID.fromString(decrypt))
                     .orElseThrow(() -> new BadRequestException("Wallet not found"));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -49,11 +49,6 @@ public class WalletService {
 
     public Wallet getWallet(UUID uuid) {
         return walletRepository.findById(uuid).orElseThrow(() -> new BadRequestException("Wallet not found"));
-    }
-
-    public void deleteWallet(String walletId) {
-        Wallet wallet = getWallet(walletId);
-        walletRepository.delete(wallet);
     }
 
     public void updateBalance(Wallet source, Wallet destination, BigDecimal amount) {
