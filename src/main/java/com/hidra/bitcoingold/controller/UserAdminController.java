@@ -39,13 +39,15 @@ public class UserAdminController {
     }
 
     @PutMapping
-    public void updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
-        adminService.updateUser(UserMapper.INSTANCE.toUser(userUpdateRequest));
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
+        User user = adminService.updateUser(UserMapper.INSTANCE.toUser(userUpdateRequest));
+        return new ResponseEntity<>(UserMapper.INSTANCE.toUserResponse(user), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable UUID id) {
+    public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
         adminService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

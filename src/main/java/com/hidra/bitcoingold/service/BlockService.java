@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +29,7 @@ public class BlockService {
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final WalletService walletService;
+    private static final String BANK_ID = "84741a3d-ff44-45fe-af84-fe9e05079ef8";
 
     public boolean isBlockchainEmpty() {
         return blockRepository.count() == 0;
@@ -146,6 +148,20 @@ public class BlockService {
                     .append(tx.getDestination().getUuid())
                     .append(tx.getAmount().toPlainString());
         }
+        return sha256(sb.toString());
+    }
+
+    public String calculateTransactionsHash2(List<Transaction> transactions) {
+        StringBuilder sb = new StringBuilder();
+
+        transactions.stream()
+                .sorted(Comparator.comparing(Transaction::getId)) // garante ordem
+                .forEach(tx -> sb.append(tx.getId())
+                        .append(tx.getSource().getUuid())
+                        .append(tx.getDestination().getUuid())
+                        .append(tx.getAmount().toPlainString())
+                );
+
         return sha256(sb.toString());
     }
 

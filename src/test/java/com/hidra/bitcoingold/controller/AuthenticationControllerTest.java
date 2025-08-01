@@ -3,9 +3,7 @@ package com.hidra.bitcoingold.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hidra.bitcoingold.domain.User;
 import com.hidra.bitcoingold.dtos.user.RegisterUserPostRequest;
-import com.hidra.bitcoingold.dtos.user.TokenResponse;
 import com.hidra.bitcoingold.dtos.user.UserLoginRequest;
-import com.hidra.bitcoingold.dtos.user.UserResponse;
 import com.hidra.bitcoingold.mapper.UserMapper;
 import com.hidra.bitcoingold.security.TokenService;
 import com.hidra.bitcoingold.service.AuthorizationService;
@@ -28,7 +26,8 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)

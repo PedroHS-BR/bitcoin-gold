@@ -3,6 +3,7 @@ package com.hidra.bitcoingold.service;
 import com.hidra.bitcoingold.domain.User;
 import com.hidra.bitcoingold.repository.UserRepository;
 import com.hidra.bitcoingold.util.UserCreator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +47,12 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        userRepository.deleteAll();
         user = UserCreator.createValidUser();
+    }
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
 

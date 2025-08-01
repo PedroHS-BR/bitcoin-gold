@@ -23,7 +23,7 @@ public class TransactionService {
     private final WalletRepository walletRepository;
 
     public Transaction createTransaction(UUID destination, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
         Wallet destinationWallet = walletService.getWallet(destination);
