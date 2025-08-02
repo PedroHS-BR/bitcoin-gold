@@ -12,7 +12,7 @@
 - [🚀 Aplicação Online (Demo)](#-aplicação-online-demo)
 - [📖 Visão Geral](#-visão-geral)
 - [✨ Funcionalidades Principais](#-funcionalidades-principais)
-- [🛠️ Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [🛠️ Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [🚀 Como Executar o Projeto Localmente](#-como-executar-o-projeto-localmente)
 - [👨‍💻 Contato](#-contato)
 - [📄 Licença](#-licença)
