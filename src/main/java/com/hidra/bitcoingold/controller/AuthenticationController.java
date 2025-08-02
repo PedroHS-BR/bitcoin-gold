@@ -12,6 +12,7 @@ import com.hidra.bitcoingold.security.TokenService;
 import com.hidra.bitcoingold.service.AuthorizationService;
 import com.hidra.bitcoingold.service.TransactionService;
 import com.hidra.bitcoingold.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,15 @@ public class AuthenticationController {
     private final UserService userService;
     private final TransactionService transactionService;
 
-
+    @Operation(
+            summary = "Realiza autenticação do usuário e gera token JWT",
+            description = """
+        Recebe o e-mail e senha do usuário para autenticação.
+        Em caso de sucesso, retorna um token JWT que deve ser usado para autenticação nas chamadas protegidas da API.
+        
+        Se as credenciais forem inválidas, retorna erro 400 com mensagem "Invalid email or password".
+        """
+    )
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
         try {
@@ -44,17 +53,51 @@ public class AuthenticationController {
         }
     }
 
+    @Operation(
+            summary = "Registra um novo usuário na plataforma",
+            description = """
+        Cria um novo usuário com nome, e-mail e senha. Uma carteira digital é automaticamente associada ao usuário. A senha é armazenada de forma segura com criptografia.
+        
+        Caso o número total de usuários cadastrados seja igual ou inferior a 100, o novo usuário recebe um bônus de boas-vindas via transação automática.
+        
+        Retorna os dados do usuário recém-criado com status HTTP 201 (Created).
+        """
+    )
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerNewUser(@RequestBody @Valid RegisterUserPostRequest registerUserPostRequest) {
         User user = authorizationService.createRegularuser(UserMapper.INSTANCE.toUser(registerUserPostRequest));
-        if (userService.howManyUsers() <= 100){
+        if (userService.howManyUsers() <= 100) {
             transactionService.newUserBonusTransaction(user);
         }
         return new ResponseEntity<>(UserMapper.INSTANCE.toUserResponse(user), HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Estabelece conexão com a rede Bitcoin Gold",
+            description = """
+        Endpoint utilizado para verificar a conectividade básica com a rede Bitcoin Gold.
+        Pode ser usado como teste de disponibilidade ou health check da API.
+        Retorna uma mensagem simples de confirmação da conexão.
+        """
+    )
     @GetMapping("/connect")
     public ResponseEntity<String> connect() {
         return ResponseEntity.ok("Connecting to Bitcoin");
+    }
+
+    @Operation(summary = "Retorna informações do desenvolvedor da API"
+            , description = """
+        GitHub: <a href='https://github.com/PedroHS-BR' target='_blank'>GITHUB</a><br>
+        Linkedin: <a href='https://www.linkedin.com/in/pedro-henrique-543580205/' target='_blank'>LinkedIn</a><br>
+        Email: pedro.hsilva.pe@gmail.com
+        """
+    )
+    @GetMapping("/dev")
+    public ResponseEntity<String> developer() {
+        return ResponseEntity.ok("""
+                GitHub: https://github.com/PedroHS-BR\s
+                Linkedin https://www.linkedin.com/in/pedro-henrique-543580205/
+                Email: pedro.hsilva.pe@gmail.com
+                """);
     }
 }

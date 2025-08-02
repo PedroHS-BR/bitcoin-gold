@@ -5,6 +5,7 @@ import com.hidra.bitcoingold.domain.UserRole;
 import com.hidra.bitcoingold.exception.BadRequestException;
 import com.hidra.bitcoingold.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,6 +35,10 @@ public class AuthorizationService implements UserDetailsService {
         user.setRole(UserRole.USER);
         String walletId = walletService.createWallet();
         user.setWalletId(walletId);
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("E-mail already exists");
+        }
     }
 }

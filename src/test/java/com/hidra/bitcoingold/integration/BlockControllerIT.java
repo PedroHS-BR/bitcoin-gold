@@ -45,7 +45,6 @@ public class BlockControllerIT {
     private String token;
     @Autowired
     private BlockRepository blockRepository;
-    private final String BANK_WALLET = "84741a3d-ff44-45fe-af84-fe9e05079ef8";
     @Autowired
     private WalletService walletService;
     @Autowired

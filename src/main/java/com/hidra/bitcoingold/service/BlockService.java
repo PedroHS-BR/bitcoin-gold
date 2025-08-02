@@ -64,7 +64,7 @@ public class BlockService {
             miner = source.getUuid().toString();
             transactionService.createMinerTransaction(source.getUuid());
         }
-        else miner = "84741a3d-ff44-45fe-af84-fe9e05079ef8";
+        else miner = BANK_ID;
 
 
         String previousHash = previousBlock.getBlockHash();
@@ -92,7 +92,7 @@ public class BlockService {
 
     public void createGenesisBlock() {
         List<Block> all = blockRepository.findAll();
-        UUID bankId = UUID.fromString("84741a3d-ff44-45fe-af84-fe9e05079ef8");
+        UUID bankId = UUID.fromString(BANK_ID);
         Wallet bankWallet = Wallet.builder()
                 .uuid(bankId)
                 .balance(BigDecimal.valueOf(1_000_000))
