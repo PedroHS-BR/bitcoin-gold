@@ -76,7 +76,7 @@ A arquitetura do sistema segue o padrão de camadas (Controller, Service, Reposi
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 | Categoria              | Tecnologias                                    |
 |------------------------|------------------------------------------------|
