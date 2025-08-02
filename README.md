@@ -18,7 +18,7 @@
 - [📄 Licença](#-licença)
 
 ---
-## 🚀 Aplicação Online (Demo)
+## 🚀 Aplicação Online
 
 O projeto está disponível para acesso e testes no seguinte endereço:
 
